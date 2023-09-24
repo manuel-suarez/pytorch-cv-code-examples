@@ -378,3 +378,10 @@ class ImageSegmentation(torch.nn.Module):
         x = self.uc1(x, mp1_indices, output_size=shape1)
 
         return x
+
+# Run the model once on a single input batch to make sure that the model
+# runs as expected and returns a tensor with the expected shape.
+m = ImageSegmentation(kernel_size=3)
+m.eval()
+to_device(m)
+m(to_device(train_pets_inputs)).shape
