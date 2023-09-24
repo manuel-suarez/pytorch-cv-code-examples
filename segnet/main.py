@@ -229,3 +229,16 @@ pets_test_loader = torch.utils.data.DataLoader(
 (train_pets_inputs, train_pets_targets) = next(iter(pets_train_loader))
 (test_pets_inputs, test_pets_targets) = next(iter(pets_test_loader))
 print(train_pets_inputs.shape, train_pets_targets.shape)
+
+# Let's inspect some of the images
+pets_input_grid = torchvision.utils.make_grid(train_pets_inputs, nrow=8)
+plt.imshow(t2img(pets_input_grid))
+plt.savefig("figure03.png")
+plt.close()
+
+pets_targets_grid = torchvision.utils.make_grid(train_pets_targets / 2.0, nrow=8)
+plt.imshow(t2img(pets_targets_grid))
+plt.savefig("figure04.png")
+plt.close()
+
+print(train_pets_targets[3][0][4])
