@@ -63,4 +63,4 @@ def close_figures():
     while len(plt.get_fignums()) > 0:
         plt.close()
 
-print("f"CUDA: {torch.cuda.is_available()})
+print(f"CUDA: {torch.cuda.is_available()}")
