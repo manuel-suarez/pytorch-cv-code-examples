@@ -811,14 +811,14 @@ print_test_dataset_masks(mdsc, test_pets_inputs, test_pets_targets, epoch=0, sav
 # epoch.
 #
 save_path = os.path.join(working_dir, "segnet_basic_training_progress_images")
-train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 21), optimizer, scheduler, save_path)
+train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 101), optimizer, scheduler, save_path)
 
 # Save the model's checkpoint.
 save_model_checkpoint(m, f"pets_segnet_CrossEntropyLoss_LRSchedule_20_epochs.pth")
 
 # Train the model that uses depthwise separable convolutions.
 save_path2 = os.path.join(working_dir, "segnet_basic_dsc_training_progress_images")
-train_loop(mdsc, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 21), optimizer2, scheduler2, save_path2)
+train_loop(mdsc, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 101), optimizer2, scheduler2, save_path2)
 
 save_model_checkpoint(mdsc, f"pets_segnet_DSC_CrossEntropyLoss_20_epochs.pth")
 
