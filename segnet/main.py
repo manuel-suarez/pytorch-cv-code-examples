@@ -781,6 +781,15 @@ mdsc(to_device(train_pets_inputs)).shape
 
 print_model_parameters(mdsc)
 
+to_device(mdsc)
+optimizer2 = torch.optim.Adam(mdsc.parameters(), lr=0.001)
+scheduler2 = None
+
+# Check if our helper functions work as expected and if the image
+# is generated as expected.
+save_path = os.path.join(working_dir, "segnet_basic_dsc_training_progress_images")
+os.makedirs(save_path, exist_ok=True)
+print_test_dataset_masks(mdsc, test_pets_inputs, test_pets_targets, epoch=0, save_path=None, show_plot=True)
 
 # Train our model for 20 epochs, and record the following:
 #
@@ -802,8 +811,28 @@ print_model_parameters(mdsc)
 # epoch.
 #
 save_path = os.path.join(working_dir, "segnet_basic_training_progress_images")
-train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 5), optimizer, scheduler, save_path)
+train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 21), optimizer, scheduler, save_path)
 
 # Save the model's checkpoint.
 save_model_checkpoint(m, f"pets_segnet_CrossEntropyLoss_LRSchedule_20_epochs.pth")
+
+# Train the model that uses depthwise separable convolutions.
+save_path2 = os.path.join(working_dir, "segnet_basic_dsc_training_progress_images")
+train_loop(mdsc, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 21), optimizer2, scheduler2, save_path2)
+
+save_model_checkpoint(mdsc, f"pets_segnet_DSC_CrossEntropyLoss_20_epochs.pth")
+
+# Load both model checkpoints.
+load_model_from_checkpoint(m, f"pets_segnet_CrossEntropyLoss_LRSchedule_20_epochs.pth")
+load_model_from_checkpoint(mdsc, f"pets_segnet_DSC_CrossEntropyLoss_20_epochs.pth")
+
+# Let's test the accuracy of both models on the test dataset.
+with torch.inference_mode():
+    # Accuracy of the model with ~15M parameters.
+    test_dataset_accuracy(m, pets_test_loader)
+    # Accuracy of the model with ~1.75M parameters.
+    test_dataset_accuracy(mdsc, pets_test_loader)
+
+# Clear the PyTorch CUDA cache to free up some memory.
+torch.cuda.empty_cache()
 
