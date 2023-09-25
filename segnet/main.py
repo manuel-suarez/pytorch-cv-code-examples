@@ -35,7 +35,7 @@ def get_device():
 def load_model_from_checkpoint(model, ckp_path):
     return model.load_state_dict(
         torch.load(
-            ckp_path,
+            os.path.join(working_dir, ckp_path),
             map_location=get_device()
         )
     )
