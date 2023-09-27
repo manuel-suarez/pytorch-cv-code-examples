@@ -191,3 +191,55 @@ visualize(
                                                  select_class_rgb_values),
     one_hot_encoded_mask = reverse_one_hot(mask)
 )
+
+def get_training_augmentation():
+    train_transform = [
+        album.RandomCrop(height=1024, width=1024, always_apply=True),
+        album.HorizontalFlip(p=0.5),
+        album.VerticalFlip(p=0.5),
+    ]
+    return album.Compose(train_transform)
+
+def get_validation_augmentation():
+    train_transform = [
+        album.CenterCrop(height=1024, width=1024, always_apply=True)
+    ]
+    return album.Compose(train_transform)
+
+def to_tensor(x, **kwargs):
+    return x.transpose(2, 0, 1).astype('float32')
+
+def get_preprocessing(preprocessing_fn=None):
+    """Construct preprocessing transform
+    Args:
+        preprocessing_fn (callable): data normalization function
+        (can be specific for each pretrained neural network)
+    Return:
+        transform: albumentations.Compose
+    """
+    _transform = []
+    if preprocessing_fn:
+        _transform.append(album.Lambda(image=preprocessing_fn))
+    _transform.append(album.Lambda(image=to_tensor, mask=to_tensor))
+
+    return album.Compose(_transform)
+
+augmented_dataset = LandCoverDataset(
+    train_df,
+    augmentation=get_training_augmentation(),
+    class_rgb_values=select_class_rgb_values
+)
+
+random_idx = random.randint(0, len(augmented_dataset) - 1)
+
+# Different augmentations on image/mask pairs
+for idx in range(3):
+    image, mask = augmented_dataset[idx]
+    visualize(
+        f"figure0{idx+2}.png",
+        original_image = image,
+        ground_truth_mask = colour_code_segmentation(
+            reverse_one_hot(mask), select_class_rgb_values
+        ),
+        one_hot_encoded_mask = reverse_one_hot(mask)
+    )
