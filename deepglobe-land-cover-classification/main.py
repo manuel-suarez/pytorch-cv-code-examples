@@ -405,3 +405,15 @@ for idx in range(len(test_dataset)):
     gt_mask = colour_code_segmentation(reverse_one_hot(gt_mask), select_class_rgb_values)
     cv2.imwrite(os.path.join(sample_preds_folder, f"sample_pred_{idx}.png"),
                 np.hstack([image_vis, gt_mask, pred_mask])[:,:,::-1])
+
+    test_epoch = smp.utils.train.ValidEpoch(
+        model,
+        loss=loss,
+        metrics=metrics,
+        device=DEVICE,
+        verbose=True
+    )
+    valid_logs = test_epoch.run(test_dataloader)
+    print("Evaluation on Test Data: ")
+    print(f"Mean IoU Score: {valid_logs['iou_score']:.4f}")
+    print(f"Mean Dice Loss: {valid_logs['dice_loss']:.4f}")
