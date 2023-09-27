@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 
 import torch
 import torch.nn
-from torch.tuils.data import DataLoader
+from torch.utils.data import DataLoader
 import albumentations as album
 
 import segmentation_models_pytorch as smp
