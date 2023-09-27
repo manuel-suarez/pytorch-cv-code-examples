@@ -276,3 +276,35 @@ valid_dataset = LandCoverDataset(
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=2)
 valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=4)
 
+# Set flag to train the model or not. If set to 'False', only prediction is
+# performed (using an older model checkpoint)
+TRAINING = True
+
+# Set num of epochs
+EPOCHS = 5
+
+# Set device: 'cuda' or 'cpu'
+DEVICE = torch.device("CUDA" if torch.cuda.is_available() else "cpu")
+
+# define loss function
+loss = smp.utils.losses.DiceLoss()
+
+# define metrics
+metrics = [
+    smp.utils.metrics.IoU(threshold=0.5)
+]
+
+# define optimizer
+optimizer = torch.optim.Adam([
+    dict(params=model.parameters(), lr=0.00008)
+])
+
+# define learning rate scheduler
+lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+    optimizer, T_0=1, T_mult=2, eta_min=5e-5
+)
+
+# load best saved model checkpoint from previous commit (if present)
+if os.path.exists('best_model.pth'):
+    model = torch.load('best_model.pth', map_location=DEVICE)
+    print('Loaded pre-trained DeepLabV3+ model!')
