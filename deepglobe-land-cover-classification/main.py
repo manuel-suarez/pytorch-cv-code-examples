@@ -257,3 +257,22 @@ model = smp.DeepLabV3Plus(
     activation=ACTIVATION
 )
 preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
+
+# Get train and val dataset instances
+train_dataset = LandCoverDataset(
+    train_df,
+    augmentation=get_training_augmentation(),
+    preprocessing=get_preprocessing(preprocessing_fn),
+    class_rgb_values=select_class_rgb_values
+)
+valid_dataset = LandCoverDataset(
+    valid_df,
+    augmentation=get_validation_augmentation(),
+    preprocessing=get_preprocessing(preprocessing_fn),
+    class_rgb_values=select_class_rgb_values
+)
+
+# Get train and val data loaders
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=2)
+valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=4)
+
