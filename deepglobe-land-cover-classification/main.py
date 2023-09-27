@@ -284,7 +284,7 @@ TRAINING = True
 EPOCHS = 5
 
 # Set device: 'cuda' or 'cpu'
-DEVICE = torch.device("CUDA" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # define loss function
 loss = smp.utils.losses.DiceLoss()
