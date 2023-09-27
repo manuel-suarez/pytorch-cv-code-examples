@@ -34,3 +34,13 @@ metadata_df = metadata_df.sample(frac=1).reset_index(drop=True)
 valid_df = metadata_df.sample(frac=0.1, random_state=42)
 train_df = metadata_df.drop(valid_df.index)
 print(len(train_df), len(valid_df))
+
+class_dict = pd.read_csv(os.path.join(DATA_DIR, 'class_dict.csv'))
+# Get class names
+class_names = class_dict['name'].tolist()
+# Get class RGB values
+class_rgb_values = class_dict[['r', 'g', 'b']].values.tolist()
+
+print('All dataset classes and their corresponding RGB values in labels:')
+print('Class Names: ', class_names)
+print('Class RGB values: ', class_rgb_values)
