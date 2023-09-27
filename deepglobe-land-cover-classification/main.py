@@ -287,6 +287,7 @@ EPOCHS = 5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # define loss function
+from segmentation_models_pytorch import utils
 loss = smp.utils.losses.DiceLoss()
 
 # define metrics
