@@ -305,8 +305,8 @@ lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
 )
 
 # load best saved model checkpoint from previous commit (if present)
-if os.path.exists('best_model.pth'):
-    model = torch.load('best_model.pth', map_location=DEVICE)
+if os.path.exists(os.path.join(DATA_DIR, 'best_model.pth')):
+    model = torch.load(os.path.join(DATA_DIR, 'best_model.pth'), map_location=DEVICE)
     print('Loaded pre-trained DeepLabV3+ model!')
 
 train_epoch = smp.utils.train.TrainEpoch(
@@ -343,3 +343,65 @@ if TRAINING:
             best_iou_score = valid_logs['iou_score']
             torch.save(model, 'best_model.pth')
             print(f"Model saved on epoch {i}!")
+
+# load best saved model checkpoint from the current run
+if os.path.exists('best_model.pth'):
+    best_model = torch.load('best_model.pth', map_location=DEVICE)
+    print('Loaded DeepLabV3+ model from this run.')
+
+# load best saved model checkkpoint from previous commit (if present)
+elif os.path.exists(os.path.join(DATA_DIR, 'best_model.pth')):
+    best_model = torch.load(os.path.join(DATA_DIR, 'best_model.pth'), map_location=DEVICE)
+    print('Loaded DeepLabV3+ model from a previous commit.')
+
+# create test dataloader to be used with DeepLabV3+ model
+test_dataset = LandCoverDataset(
+    valid_df,
+    augmentation=get_validation_augmentation(),
+    preprocessing=get_preprocessing(preprocessing_fn),
+    class_rgb_values=select_class_rgb_values
+)
+test_dataloader = DataLoader(test_dataset)
+
+# test dataset for visualization (without preprocessing augmentations & transformations)
+test_dataset_vis = LandCoverDataset(
+    valid_df,
+    augmentation=get_validation_augmentation(),
+    class_rgb_values=select_class_rgb_values
+)
+
+# get a random test image/mask index
+random_idx = random.randint(0, len(test_dataset_vis)-1)
+image, mask = test_dataset_vis[random_idx]
+
+visualize(
+    "figure05.png",
+    original_image = image,
+    ground_truth_mask = colour_code_segmentation(
+        reverse_one_hot(mask), select_class_rgb_values),
+    one_hot_encoded_mask = reverse_one_hot(mask)
+)
+
+sample_preds_folder = 'sample_predictions/'
+if not os.path.exists(sample_preds_folder):
+    os.makedirs(sample_preds_folder)
+best_model = model
+
+for idx in range(len(test_dataset)):
+    image, gt_mask = test_dataset[idx]
+    image_vis = test_dataset_vis[idx][0].astype('uint8')
+    x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+    # Predict test image
+    pred_mask = best_model(x_tensor)
+    pred_mask = pred_mask.detach().squeeze().cpu().numpy()
+    # Convert pred_mask from 'CHW' format to 'HWC' format
+    pred_mask = np.transpose(pred_mask, (1,2,0))
+    # Get prediction channel corresponding to foreground
+    pred_urban_land_heatmap = pred_mask[:,:,select_classes.index('urban_land')]
+    pred_mask = colour_code_segmentation(reverse_one_hot(pred_mask),
+                                         select_class_rgb_values)
+    # Convert gt_mask from 'CHW' format to 'HWC' format
+    gt_mask = np.transpose(gt_mask, (1,2,0))
+    gt_mask = colour_code_segmentation(reverse_one_hot(gt_mask), select_class_rgb_values)
+    cv2.imwrite(os.path.join(sample_preds_folder, f"sample_pred_{idx}.png"),
+                np.hstack([image_vis, gt_mask, pred_mask])[:,:,::-1])
