@@ -173,13 +173,14 @@ class LandCoverDataset(torch.utils.data.Dataset):
             sample = self.preprocessing(image=image, mask=mask)
             image, mask = sample['image'], sample['mask']
 
-            return image, mask
+        return image, mask
 
     def __len__(self):
         # return length of
         return len(self.image_paths)
 
 dataset = LandCoverDataset(train_df, class_rgb_values=select_class_rgb_values)
+print(dataset)
 random_idx = random.randint(0, len(dataset)-1)
 image, mask = dataset[2]
 
