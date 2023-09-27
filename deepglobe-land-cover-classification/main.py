@@ -281,7 +281,7 @@ valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_worker
 TRAINING = True
 
 # Set num of epochs
-EPOCHS = 5
+EPOCHS = 40
 
 # Set device: 'cuda' or 'cpu'
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
