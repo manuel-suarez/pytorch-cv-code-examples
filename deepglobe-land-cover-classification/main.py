@@ -308,3 +308,38 @@ lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
 if os.path.exists('best_model.pth'):
     model = torch.load('best_model.pth', map_location=DEVICE)
     print('Loaded pre-trained DeepLabV3+ model!')
+
+train_epoch = smp.utils.train.TrainEpoch(
+    model,
+    loss=loss,
+    metrics=metrics,
+    optimizer=optimizer,
+    device=DEVICE,
+    verbose=True
+)
+
+valid_epoch = smp.utils.train.ValidEpoch(
+    model,
+    loss=loss,
+    metrics=metrics,
+    device=DEVICE,
+    verbose=True
+)
+
+if TRAINING:
+    best_iou_score = 0.0
+    train_logs_list, valid_logs_list = [], []
+
+    for i in range(0, EPOCHS):
+        # Perform training & validation
+        print('\nEpoch: {}'.format(i))
+        train_logs = train_epoch.run(train_loader)
+        valid_logs = valid_epoch.run(valid_loader)
+        train_logs_list.append(train_logs)
+        valid_logs_list.append(valid_logs)
+
+        # Save model if a better val IoU score is obtained
+        if best_iou_score < valid_logs['iou_score']:
+            best_iou_score = valid_logs['iou_score']
+            torch.save(model, 'best_model.pth')
+            print(f"Model saved on epoch {i}!")
