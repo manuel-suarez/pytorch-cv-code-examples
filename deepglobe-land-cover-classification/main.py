@@ -33,4 +33,4 @@ metadata_df = metadata_df.sample(frac=1).reset_index(drop=True)
 # Perform 90/10 split for train/val
 valid_df = metadata_df.sample(frac=0.1, random_state=42)
 train_df = metadata_df.drop(valid_df.index)
-len(train_df), len(valid_df)
+print(len(train_df), len(valid_df))
