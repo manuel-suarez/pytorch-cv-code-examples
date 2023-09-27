@@ -57,7 +57,7 @@ print('Class Names: ', class_names)
 print('Class RGB values: ', class_rgb_values)
 
 # helper function for data visualization
-def visualize(**images):
+def visualize(figname, **images):
     """
     Plot images in one row
     """
@@ -71,6 +71,8 @@ def visualize(**images):
         plt.title(name.replace('_',' ').title(), fontsize=20)
         plt.imshow(image)
     plt.show()
+    plt.savefig(figname)
+    plt.close()
 
 # Perform one hot encoding on label
 def one_hot_encode(label, label_values):
@@ -176,3 +178,15 @@ class LandCoverDataset(torch.utils.data.Dataset):
     def __len__(self):
         # return length of
         return len(self.image_paths)
+
+dataset = LandCoverDataset(train_df, class_rgb_values=select_class_rgb_values)
+random_idx = random.randint(0, len(dataset)-1)
+image, mask = dataset[2]
+
+visualize(
+    'figure01.png',
+    original_image = image,
+    ground_truth_mask = colour_code_segmentation(reverse_one_hot(mask),
+                                                 select_class_rgb_values),
+    one_hot_encoded_mask = reverse_one_hot(mask)
+)
