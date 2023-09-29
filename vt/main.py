@@ -645,4 +645,4 @@ m = vit
 images_folder_name = "vit_training_progress_images"
 save_path = os.path.join(working_dir, images_folder_name)
 os.makedirs(save_path, exist_ok=True)
-print_test_dataset_masks(m, test_pets_inputs, test_pets_targets, epoch=0, save_path=None, show_plot=True)
+print_test_dataset_masks(m, test_pets_inputs, test_pets_targets, epoch=0, save_path=save_path, show_plot=False)
