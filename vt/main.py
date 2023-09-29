@@ -498,4 +498,5 @@ def test_custom_iou_loss():
     z = IoULoss(softmax=True)(x, y)
     return z
 
-test_custom_iou_loss()
+print_title("Test custom IoU loss")
+print(test_custom_iou_loss())
