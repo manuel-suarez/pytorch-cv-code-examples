@@ -98,6 +98,12 @@ pets_path_test = os.path.join(working_dir, 'OxfordPets', 'test')
 pets_train_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_train, split="trainval", target_types="segmentation", download=False)
 pets_test_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_test, split="test", target_types="segmentation", download=False)
 
+pets_train_orig, pets_test_orig
+(train_pets_input, train_pets_target) = pets_train_orig[0]
+
+plt.imshow(train_pets_input)
+plt.savefig("figure01.png")
+
 # ImageToPatches returns multiple flattened square patches from an input image tensor
 class ImageToPatches(nn.Module):
     def __init__(self, image_size, patch_size):
@@ -300,3 +306,18 @@ vit = VisionTransformerForSegmentation(**vit_args)
 y = vit(x)
 print(f"{x.shape} -> {y.shape}")
 print_model_parameters(vit)
+
+from enum import IntEnum
+class TrimapClasses(IntEnum):
+    PET = 0
+    BACKGROUND = 1
+    BORDER = 2
+
+# Convert a float trimap ({1, 2, 3}) / 255.0) into a float tensor with
+# pixel values in the range 0.0 to 1.0 so that the border pixels
+# can be properly displayed.
+def trimap2f(trimap):
+    return (img2t(trimap) * 255.0 - 1) / 2
+
+plt.imshow(t2img(trimap2f(train_pets_target)))
+plt.savefig("figure02.png")
