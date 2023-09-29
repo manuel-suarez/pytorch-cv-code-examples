@@ -458,4 +458,4 @@ pets_test_loader = torch.utils.data.DataLoader(
 
 (train_pets_inputs, train_pets_targets) = next(iter(pets_train_loader))
 (test_pets_inputs, test_pets_targets) = next(iter(pets_test_loader))
-train_pets_inputs.shape, train_pets_targets.shape
+print(train_pets_inputs.shape, train_pets_targets.shape)
