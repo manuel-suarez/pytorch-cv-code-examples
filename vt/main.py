@@ -258,3 +258,26 @@ op = OutputProjection(224, 16, 256, 3)
 y = op(x)
 print(f"{x.shape} -> {y.shape}")
 
+class VisionTransformerForSegmentation(nn.Module):
+    def __init__(self, image_size, patch_size, in_channels, out_channels, embed_size, num_blocks, num_heads, dropout):
+        super().__init__()
+        self.image_size = image_size
+        self.patch_size = patch_size
+        self.embed_size = embed_size
+        self.num_blocks = num_blocks
+        self.num_heads = num_heads
+        self.dropout = dropout
+
+        heads = [SelfAttentionEncoderBlock(embed_size, num_heads, dropout) for i in range(num_blocks)]
+        self.layers = nn.Sequential(
+            nn.BatchNorm2d(num_features=in_channels),
+            VisionTransformerInput(image_size, patch_size, in_channels, embed_size),
+            nn.Sequential(*heads),
+            OutputProjection(image_size, patch_size, embed_size, out_channels)
+        )
+
+    def forward(self, x):
+        x = self.layers(x)
+        return x
+
+
