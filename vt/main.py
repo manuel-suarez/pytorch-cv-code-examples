@@ -280,4 +280,23 @@ class VisionTransformerForSegmentation(nn.Module):
         x = self.layers(x)
         return x
 
+@dataclass
+class VisionTransformerArgs:
+    """Arguments to the VisionTransformerForSegmentation."""
+    image_size: int = 128
+    patch_size: int = 16
+    in_channels: int = 3
+    out_channels: int = 3
+    embed_size: int = 768
+    num_blocks: int = 12
+    num_heads: int = 8
+    dropout: float = 0.2
 
+print_title("VisionTransformerForSegmentation")
+x = torch.randn(2, 3, 128, 128)
+vit_args = dataclasses.asdict(VisionTransformerArgs())
+
+vit = VisionTransformerForSegmentation(**vit_args)
+y = vit(x)
+print(f"{x.shape} -> {y.shape}")
+print_model_parameters(vit)
