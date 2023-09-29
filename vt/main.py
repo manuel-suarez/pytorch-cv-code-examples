@@ -227,3 +227,34 @@ x = torch.randn(10, 20, 256)
 attention_block = SelfAttentionEncoderBlock(256, 8, dropout=0.2)
 y = attention_block(x)
 print(f"{x.shape} -> {y.shape}")
+
+# Similar to the PatchEmbedding class, we need to un-embed the representation
+# of each patch that has been produced by our transformer network. We project
+# each patch (that has embed_size) dimensions into patch_size*patch_size*output_dims
+# channels, and then fold all the patches back to make it look like an image.
+class OutputProjection(nn.Module):
+    def __init__(self, image_size, patch_size, embed_size, output_dims):
+        super().__init__()
+        self.patch_size = patch_size
+        self.output_dims = output_dims
+        self.projection = nn.Linear(embed_size, patch_size * patch_size * output_dims)
+        self.fold = nn.Fold(output_size=(image_size, image_size), kernel_size=patch_size, stride=patch_size)
+
+    def forward(self, x):
+        B, T, C = x.shape
+        x = self.projection(x)
+        # x will now have shape (B, T, PatchSize**2 * OutputDims). This can be folded into
+        # the desired output shape.
+
+        # To fold the patches back into an image-like form, we need to first
+        # swap the T and C dimensions to make it a (B, C, T) tensor.
+        x = x.permute(0, 2, 1)
+        x = self.fold(x)
+        return x
+
+print_title("OutputProjection")
+x = torch.randn(2, 196, 256)
+op = OutputProjection(224, 16, 256, 3)
+y = op(x)
+print(f"{x.shape} -> {y.shape}")
+
