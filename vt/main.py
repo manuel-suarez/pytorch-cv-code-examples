@@ -646,3 +646,53 @@ images_folder_name = "vit_training_progress_images"
 save_path = os.path.join(working_dir, images_folder_name)
 os.makedirs(save_path, exist_ok=True)
 print_test_dataset_masks(m, test_pets_inputs, test_pets_targets, epoch=0, save_path=save_path, show_plot=False)
+
+# Optimizer and Learning Rate Scheduler.
+to_device(m)
+optimizer = torch.optim.Adam(m.parameters(), lr=0.0004)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=12, gamma=0.8)
+
+# Define training loop. This will train the model for multitple epochs.
+#
+# epochs: A tuple containing the start epoch (inclusive) and end epoch (exclusive).
+#         The model is trained for [epoch[0] .. epoch[1]) epochs.
+#
+def train_loop(model, loader, test_data, epochs, optimizer, scheduler, save_path):
+    test_inputs, test_targets = test_data
+    epoch_i, epoch_j = epochs
+    for i in range(epoch_i, epoch_j):
+        epoch = i
+        print(f"Epoch: {i:02d}, Learning Rate: {optimizer.param_groups[0]['lr']}")
+        train_model(model, loader, optimizer)
+        with torch.inference_mode():
+            # Display the plt in the final training epoch.
+            # (epoch == epoch_j-1)
+            print_test_dataset_masks(model, test_inputs, test_targets, epoch=epoch, save_path=save_path, show_plot=False)
+        if scheduler is not None:
+            scheduler.step()
+        print("")
+
+# Train out model for 20 epochs, and record the following:
+#
+# 1. Training loss
+# 2. Test accuracy metrics for a single batch (21 images) of test images. The following
+#    metrics are computed:
+#    2.1. Pixel Accuracy
+#    2.2. IoU Accuracy (weighted)
+#    2.3. Custom IoU Accuracy
+#
+# We algo plot the following for each of the 21 images in the validation batch:
+# 1. Input image
+# 2. Ground truth segmentation mask
+# 3. Predicted segmentation mask
+#
+# so that we can visually inspect the model's progress and determine how well the model
+# is doing qualitatively. Note that the validation metrics on the set of 21 images in
+# the validation set is displayed inline in the notebook only for the last training
+# epoch.
+#
+train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 51), optimizer, scheduler, save_path=save_path)
+
+# Let's test the accuracy of the model on the test dataset.
+with torch.inference_mode():
+    test_dataset_accuracy(m, pets_test_loader)
