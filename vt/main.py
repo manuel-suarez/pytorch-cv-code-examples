@@ -91,3 +91,9 @@ def print_title(title):
 
 # Validation: Check if CUDA is available
 print(f"CUDA: {torch.cuda.is_available()}")
+
+# Oxford IIIT Pets Segmentation dataset loaded via torchvision.
+pets_path_train = os.path.join(working_dir, 'OxfordPets', 'train')
+pets_path_test = os.path.join(working_dir, 'OxfordPets', 'test')
+pets_train_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_train, split="trainval", target_types="segmentation", download=True)
+pets_test_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_test, split="test", target_types="segmentation", download=True)
