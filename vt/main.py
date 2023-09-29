@@ -173,7 +173,7 @@ class VisionTransformerInput(nn.Module):
         return x
 
 print_title("VisionTransformerInput")
-x = torch.rand(10, 3, 244, 244)
+x = torch.rand(10, 3, 224, 224)
 vti = VisionTransformerInput(224, 16, 3, 256)
 y = vti(x)
 print(f"{x.shape} -> {y.shape}")
