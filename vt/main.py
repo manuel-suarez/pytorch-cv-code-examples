@@ -177,3 +177,26 @@ x = torch.rand(10, 3, 224, 224)
 vti = VisionTransformerInput(224, 16, 3, 256)
 y = vti(x)
 print(f"{x.shape} -> {y.shape}")
+
+# The MultiLayerPerceptron is a unit of computation. It expands the input
+# to 4x the number of channels, and then contracts it back into the number
+# of input channels. There's a GeLU activation in between, and the layer
+# is followed by a dropout layer.
+class MultiLayerPerceptron(nn.Module):
+    def __init__(self, embed_size, dropout):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(embed_size, embed_size * 4),
+            nn.GELU(),
+            nn.Linear(embed_size * 4, embed_size),
+            nn.Dropout(p=dropout)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+
+print_title("MultiLayerPerceptron")
+x = torch.randn(10, 50, 60)
+mlp = MultiLayerPerceptron(60, dropout=0.2)
+y = mlp(x)
+print(f"{x.shape} -> {y.shape}")
