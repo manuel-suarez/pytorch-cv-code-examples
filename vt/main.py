@@ -126,3 +126,26 @@ y = y.permute(0, 2, 1)
 z = fold(y)
 print(z)
 print(f"{y.shape} -> {z.shape}")
+
+# The PatchEmbedding layer takes multiple image patches in (B,T,Cin) format
+# and returns the embedded patches in (B,T,Cout) format.
+class PatchEmbedding(nn.Module):
+    def __init__(self, in_channels, embed_size):
+        super().__init__()
+        self.in_channels = in_channels
+        self.embed_size = embed_size
+        # A single layer is used to map all input patches to the output embedding dimension.
+        # i.e. each image patch will share the weights of this embedding layer.
+        self.embed_layer = nn.Linear(in_features=in_channels, out_features=embed_size)
+
+    def forward(self, x):
+        assert len(x.size()) == 3
+        B, T, C = x.size()
+        x = self.embed_layer(x)
+        return x
+
+print_title("PatchEmbedding")
+x = torch.rand(10, 196, 768)
+pe = PatchEmbedding(768, 256)
+y = pe(x)
+print(f"{x.shape} -> {y.shape}")
