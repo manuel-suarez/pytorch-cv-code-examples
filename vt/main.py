@@ -149,3 +149,31 @@ x = torch.rand(10, 196, 768)
 pe = PatchEmbedding(768, 256)
 y = pe(x)
 print(f"{x.shape} -> {y.shape}")
+
+class VisionTransformerInput(nn.Module):
+    def __init__(self, image_size, patch_size, in_channels, embed_size):
+        """in_channels is the number of input channels in the input that will be
+        fed into this layer. For RGB images, this value would be 3.
+        """
+        super().__init__()
+        self.i2p = ImageToPatches(image_size, patch_size)
+        self.pe = PatchEmbedding(patch_size * patch_size * in_channels, embed_size)
+        num_patches = (image_size // patch_size) ** 2
+        # position_embed below is the learned embedding for the position of each patch
+        # in the input image. They correspond to the cosine similarity of embeddings
+        # visualized in the paper "An Image is Worth 16x16 Words"
+        # https://arxiv.org/pdf/2010.11929.pdf (Figure 7, Center).
+        self.position_embed = nn.Parameter(torch.randn(num_patches, embed_size))
+
+    def forward(self, x):
+        x = self.i2p(x)
+        # print(x.shape)
+        x = self.pe(x)
+        x = x + self.position_embed
+        return x
+
+print_title("VisionTransformerInput")
+x = torch.rand(10, 3, 244, 244)
+vti = VisionTransformerInput(224, 16, 3, 256)
+y = vti(x)
+print(f"{x.shape} -> {y.shape}")
