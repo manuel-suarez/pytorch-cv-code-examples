@@ -97,3 +97,32 @@ pets_path_train = os.path.join(working_dir, 'OxfordPets', 'train')
 pets_path_test = os.path.join(working_dir, 'OxfordPets', 'test')
 pets_train_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_train, split="trainval", target_types="segmentation", download=True)
 pets_test_orig = torchvision.datasets.OxfordIIITPet(root=pets_path_test, split="test", target_types="segmentation", download=True)
+
+# ImageToPatches returns multiple flattened square patches from an input image tensor
+class ImageToPatches(nn.Module):
+    def __init__(self, image_size, patch_size):
+        super().__init__()
+        self.image_size = image_size
+        self.patch_size = patch_size
+        self.unfold = nn.Unfold(kernel_size=patch_size, stride=patch_size)
+
+    def forward(self, x):
+        assert len(x.size()) == 4
+        y = self.unfold(x)
+        y = y.permute(0, 2, 1)
+        return y
+
+print_title("ImageToPatches")
+i2p = ImageToPatches(8, 4)
+x = torch.arange(64).reshape(8, 8).float().reshape(1, 1, 8, 8)
+y = i2p(x)
+print(x)
+print(y)
+print(f"{x.shape} -> {y.shape}")
+
+print_title("nn.Fold")
+fold = nn.Fold(output_size=(8, 8), kernel_size=4, stride=4)
+y = y.permute(0, 2, 1)
+z = fold(y)
+print(z)
+print(f"{y.shape} -> {z.shape}")
