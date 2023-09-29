@@ -200,3 +200,30 @@ x = torch.randn(10, 50, 60)
 mlp = MultiLayerPerceptron(60, dropout=0.2)
 y = mlp(x)
 print(f"{x.shape} -> {y.shape}")
+
+# This is a single self-attention encoder block, which has a multi-head attention
+# block within it. The MultiHeadAttention block performs communication, while the
+# MultilayerPerceptron performs computation.
+class SelfAttentionEncoderBlock(nn.Module):
+    def __init__(self, embed_size, num_heads, dropout):
+        super().__init__()
+        self.embed_size = embed_size
+        self.ln1 = nn.LayerNorm(embed_size)
+        # self.kqv = nn.Linear(embed_size, embed_size * 3)
+        self.mha = nn.MultiheadAttention(embed_size, num_heads, dropout=dropout, batch_first=True)
+        self.ln2 = nn.LayerNorm(embed_size)
+        self.mlp = MultiLayerPerceptron(embed_size, dropout)
+
+    def forward(self, x):
+        y = self.ln1(x)
+        # y = self.kqv(x)
+        # (q, k, v) = torch.split(y, self.embed_size, dim=2)
+        x = x + self.mha(y, y, y, need_weights=False)[0]
+        x = x + self.mlp(self.ln2(x))
+        return x
+
+print_title("SelfAttentionEncoderBlock")
+x = torch.randn(10, 20, 256)
+attention_block = SelfAttentionEncoderBlock(256, 8, dropout=0.2)
+y = attention_block(x)
+print(f"{x.shape} -> {y.shape}")
