@@ -691,8 +691,9 @@ def train_loop(model, loader, test_data, epochs, optimizer, scheduler, save_path
 # the validation set is displayed inline in the notebook only for the last training
 # epoch.
 #
-train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 51), optimizer, scheduler, save_path=save_path)
+train_loop(m, pets_train_loader, (test_pets_inputs, test_pets_targets), (1, 201), optimizer, scheduler, save_path=save_path)
 
 # Let's test the accuracy of the model on the test dataset.
 with torch.inference_mode():
     test_dataset_accuracy(m, pets_test_loader)
+
