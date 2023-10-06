@@ -33,6 +33,11 @@ plt.close(fig)
 
 patch_size = 16 # 16 pixels
 patches = rearrange(x, 'b c (h s1) (w s2) -> b (h w) (s1 s2 c)', s1=patch_size, s2=patch_size)
+print(patches.shape)
+fit = plt.figure()
+plt.imshow(patches)
+plt.savefig('figure03.png')
+plt.close(fig)
 
 class PatchEmbedding(nn.Module):
     def __init__(self, in_channels: int = 3, patch_size: int = 16, emb_size: int = 768):
@@ -54,5 +59,5 @@ xpatched = xpatched.detach().numpy()
 xpatched = np.transpose(xpatched, (1, 2, 0))
 fig = plt.figure()
 plt.imshow(xpatched)
-plt.savefig('figure03.png')
+plt.savefig('figure04.png')
 plt.close(fig)
