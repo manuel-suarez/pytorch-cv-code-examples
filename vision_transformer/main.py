@@ -51,6 +51,7 @@ class PatchEmbedding(nn.Module):
 xpatched = PatchEmbedding()(x)
 print(xpatched.shape)
 xpatched = xpatched.detach().numpy()
+xpatched = np.transpose(xpatched, (1, 2, 0))
 fig = plt.figure()
 plt.imshow(xpatched)
 plt.savefig('figure03.png')
