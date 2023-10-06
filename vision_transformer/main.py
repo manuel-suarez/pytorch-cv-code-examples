@@ -48,4 +48,9 @@ class PatchEmbedding(nn.Module):
         x = self.projection(x)
         return x
 
-print(PatchEmbedding()(x).shape)
+xpatched = PatchEmbedding()(x)
+print(xpatched.shape)
+fig = plt.figure()
+plt.imshow(xpatched)
+plt.savefig('figure03.png')
+plt.close(fig)
