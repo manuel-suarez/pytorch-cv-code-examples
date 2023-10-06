@@ -12,6 +12,7 @@ from torchsummary import summary
 
 # Open image
 img = Image.open('./cat.jpg')
+
 fig = plt.figure()
 plt.imshow(img)
 plt.savefig('figure01.png')
@@ -23,6 +24,10 @@ x = transform(img)
 x = x.unsqueeze(0) # add batch dim
 print(x.shape)
 
+fig = plt.figure()
+plt.imshow(x)
+plt.savefig('figure02.png')
+plt.close(fig)
 
 patch_size = 16 # 16 pixels
 patches = rearrange(x, 'b c (h s1) (w s2) -> b (h w) (s1 s2 c)', s1=patch_size, s2=patch_size)
