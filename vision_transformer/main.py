@@ -14,7 +14,7 @@ from torchsummary import summary
 img = Image.open('./cat.jpg')
 fig = plt.figure()
 plt.imshow(img)
-plt.savefig('figure01.png0')
+plt.savefig('figure01.png')
 plt.close(fig)
 
 # Resize
