@@ -35,7 +35,7 @@ patch_size = 16 # 16 pixels
 # Figure patches
 img_patches = rearrange(x, 'b c (h s1) (w s2) -> b c (h w) (s1 s2)', s1=patch_size, s2=patch_size)
 print(img_patches.shape)
-img_patches = np.transpose(img_patches, (1, 2, 0))
+img_patches = np.transpose(img_patches[0], (1, 2, 0))
 fig = plt.figure()
 plt.imshow(img_patches)
 plt.savefig('figure03.png')
