@@ -23,7 +23,7 @@ plt.close(fig)
 transform = Compose([Resize((224, 224)), ToTensor()])
 x = transform(img)
 x = x.unsqueeze(0) # add batch dim
-print(x.shape, np.transpose(x[0], (1, 2, 0)))
+print(x.shape, np.transpose(x[0], (1, 2, 0)).shape)
 
 #fig = plt.figure()
 #plt.imshow(np.transpose(x, ()))
