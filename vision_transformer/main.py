@@ -22,12 +22,12 @@ plt.close(fig)
 transform = Compose([Resize((224, 224)), ToTensor()])
 x = transform(img)
 x = x.unsqueeze(0) # add batch dim
-print(x.shape)
+print(x.shape, np.transpose(x, (1, 2, 0)))
 
-fig = plt.figure()
-plt.imshow(x)
-plt.savefig('figure02.png')
-plt.close(fig)
+#fig = plt.figure()
+#plt.imshow(np.transpose(x, ()))
+#plt.savefig('figure02.png')
+#plt.close(fig)
 
 patch_size = 16 # 16 pixels
 patches = rearrange(x, 'b c (h s1) (w s2) -> b (h w) (s1 s2 c)', s1=patch_size, s2=patch_size)
