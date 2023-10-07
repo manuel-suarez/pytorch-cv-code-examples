@@ -46,7 +46,7 @@ plt.savefig('figure03.png')
 plt.close(fig)
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, in_channels: int = 3, patch_size: int = 16, emb_size: int = 768):
+    def __init__(self, in_channels: int = 3, patch_size: int = 16, emb_size: int = 768, img_size: int = 224):
         self.patch_size = patch_size
         super().__init__()
         self.projection = nn.Sequential(
@@ -55,6 +55,7 @@ class PatchEmbedding(nn.Module):
             Rearrange('b e (h) (w) -> b (h w) e'),
         )
         self.cls_token = nn.Parameter(torch.randn(1,1, emb_size))
+        self.positions = nn.Parameter(torch.randn((img_size // patch_size) **2 + 1, emb_size))
 
     def forward(self, x: Tensor) -> Tensor:
         b, _, _, _ = x.shape
@@ -65,7 +66,7 @@ class PatchEmbedding(nn.Module):
         return x
 
 xpatched = PatchEmbedding()(x)
-print(xpatched.shape)
+print("Patch embedding layer shape: ", xpatched.shape)
 xpatched = xpatched.detach().numpy()
 xpatched = np.transpose(xpatched, (1, 2, 0))
 fig = plt.figure()
