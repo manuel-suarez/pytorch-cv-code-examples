@@ -171,3 +171,10 @@ class TransformerEncoder(nn.Sequential):
     def __init__(self, depth: int = 12, **kwargs):
         super().__init__(*[TransformerEncoderBlock(**kwargs) for _ in range(depth)])
 
+class ClassificationHead(nn.Sequential):
+    def __init__(self, emb_size: int = 768, n_classes: int = 1000):
+        super().__init__(
+            Reduce('b n e -> b e', reduction='mean'),
+            nn.LayerNorm(emb_size),
+            nn.Linear(emb_size, n_classes)
+        )
