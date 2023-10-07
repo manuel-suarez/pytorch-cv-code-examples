@@ -14,40 +14,35 @@ from torchsummary import summary
 # Open image
 img = Image.open('./cat.jpg')
 
-fig = plt.figure()
-plt.imshow(img)
-plt.savefig('figure01.png')
-plt.close(fig)
-
 # Resize
 transform = Compose([Resize((224, 224)), ToTensor()])
 x = transform(img)
 x = x.unsqueeze(0) # add batch dim
 xprint = np.transpose(x[0], (1, 2, 0))
-print(x.shape, xprint.shape)
+print("tensor shape: ", x.shape, xprint.shape)
 
 fig = plt.figure()
 plt.imshow(xprint)
-plt.savefig('figure02.png')
+plt.savefig('figure01.png')
 plt.close(fig)
 
 patch_size = 56 # 16 pixels
 # Figure patches
-img_patches = rearrange(x, 'b c (h1 h) (w1 w) -> b c (h1 w1) (h w)', h1=2, w1=2)
-print(img_patches.shape)
+img_patches = rearrange(x, 'b c (h1 h) (w1 w) -> b c h (h1 w1 w)', h1=4, w1=4)
+print("Figure patches shape: ", img_patches.shape)
 img_patches = np.transpose(img_patches[0], (1, 2, 0))
 fig = plt.figure()
 plt.imshow(img_patches)
-plt.savefig('figure03.png')
+plt.savefig('figure02.png')
 plt.close(fig)
 
 # Embeeding patches
 patches = rearrange(x, 'b c (h s1) (w s2) -> b (h w) (s1 s2 c)', s1=patch_size, s2=patch_size)
-print(patches.shape)
+print("Embedding patches shape: ", patches.shape)
 patches = np.transpose(patches, (1, 2, 0))
 fit = plt.figure()
 plt.imshow(patches)
-plt.savefig('figure04.png')
+plt.savefig('figure03.png')
 plt.close(fig)
 
 class PatchEmbedding(nn.Module):
@@ -70,5 +65,5 @@ xpatched = xpatched.detach().numpy()
 xpatched = np.transpose(xpatched, (1, 2, 0))
 fig = plt.figure()
 plt.imshow(xpatched)
-plt.savefig('figure05.png')
+plt.savefig('figure04.png')
 plt.close(fig)
