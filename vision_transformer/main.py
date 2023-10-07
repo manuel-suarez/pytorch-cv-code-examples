@@ -134,3 +134,35 @@ class FeedForwardBlock(nn.Sequential):
             nn.Dropout(drop_p),
             nn.Linear(expansion * emb_size, emb_size),
         )
+
+class TransformerEncoderBlock(nn.Sequential):
+    def __init__(self,
+                 emb_size: int = 768,
+                 drop_p: float = 0.,
+                 forward_expansion: int = 4,
+                 forward_drop_p: float = 0.,
+                 ** kwargs
+                 ):
+        super().__init__(
+            ResidualAdd(nn.Sequential(
+                nn.LayerNorm(emb_size),
+                MultiHeadAttention(emb_size, **kwargs),
+                nn.Dropout(drop_p)
+            )),
+            ResidualAdd(nn.Sequential(
+                nn.LayerNorm(emb_size),
+                FeedForwardBlock(
+                    emb_size, expansion=forward_expansion, drop_p=forward_drop_p),
+                nn.Dropout(drop_p)
+            ))
+        )
+
+patches_embedded = PatchEmbedding()(x)
+trans_encoder = TransformerEncoderBlock()(patches_embedded)
+print("Transformer encoder block shape: ", trans_encoder.shape)
+xtrans = trans_encoder.detach().numpy()
+xtrans = np.transpose(xtrans, (1, 2, 0))
+fit = plt.figure()
+plt.imshow(xtrans)
+plt.savefig('figure06.png')
+plt.close(fig)
