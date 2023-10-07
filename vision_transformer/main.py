@@ -166,3 +166,8 @@ fit = plt.figure()
 plt.imshow(xtrans)
 plt.savefig('figure06.png')
 plt.close(fig)
+
+class TransformerEncoder(nn.Sequential):
+    def __init__(self, depth: int = 12, **kwargs):
+        super().__init__(*[TransformerEncoderBlock(**kwargs) for _ in range(depth)])
+
