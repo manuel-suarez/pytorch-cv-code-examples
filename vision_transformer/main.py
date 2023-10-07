@@ -83,7 +83,7 @@ class MultiHeadAttention(nn.Module):
         self.num_heads = num_heads
         self.keys = nn.Linear(emb_size, emb_size)
         self.queries = nn.Linear(emb_size, emb_size)
-        self.valus = nn.Linear(emb_size, emb_size)
+        self.values = nn.Linear(emb_size, emb_size)
         self.att_drop = nn.Dropout(dropout)
         self.projection = nn.Linear(emb_size, emb_size)
         self.scaling = (self.emb_size // num_heads) ** -0.5
